@@ -10,7 +10,7 @@ import scala.language.postfixOps
 import scala.concurrent.duration._
 
 
-class TestCooking extends FlatSpec with Matchers with ParallelTestExecution with AsyncAssertions {
+class TestCooking extends FlatSpec with Matchers with ParallelTestExecution with AsyncAssertions with Cook {
 
   def timed[A](block: => A) = {
     val t0 = System.nanoTime()
@@ -35,11 +35,10 @@ class TestCooking extends FlatSpec with Matchers with ParallelTestExecution with
     inputSources.foreach {
       case (fileName: String, avg: Long) =>
         val waiter = new Waiter
-        val cook = new Cook {}
         val averageWaitingTime = timed {
           for {
-            (orders, numberOfOrders) <- cook.getOrders(fileName)
-            res <- cook.ordersAvgWaitTime(orders, numberOfOrders)
+            (orders, numberOfOrders) <- getOrders(fileName)
+            res <- ordersAvgWaitTime(orders, numberOfOrders)
           } yield res
         }
         averageWaitingTime.onComplete {
